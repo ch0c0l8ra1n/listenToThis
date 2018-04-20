@@ -8,88 +8,50 @@ import (
   "encoding/json"
   "strconv"
   "./helpers"
+  "./errors"
 )
 
 var limit = 100
 var timeDelay time.Duration = 2
 
 var url = "http://www.reddit.com/r/listentothis/.json?limit=" + strconv.Itoa(limit)
-var uAgent = "rjpj's listenToThis server v0.0.1"
+var uAgent = "rjpj's obscure ageint v0.0.1"
 
 type Post struct{
     Title string
     Url string
 }
 
-type ManyPosts struct{
-    Children []Post
-}
 
 var posts []Post
 
-type Error struct{
-    ErrorCode int
-    ErrorMsg string
+type Subreddit struct{
+    Name string
+    LastUpdated int64
+    Posts []Post
 }
 
-var notInitializedError,_ = json.Marshal(
-                        Error { 0 , 
-                        "No videos currently indexed."})
+var Subreddits map[string]Subreddit
 
-
-func list(w http.ResponseWriter , r *http.Request){
-    if len(posts) == 0 {
-        w.Write(notInitializedError)
-        return
-    }
-    limit := 25
-    paramLimit := r.FormValue("limit")
-    if paramLimit != ""{
-        limit, _ = strconv.Atoi(paramLimit)
-    }
-    limit = helpers.IntMin(limit,len(posts))
-    b, _ := json.Marshal(posts[0:limit])
-    w.Write(b)
-
-}
-
-
-func server(){
-  http.HandleFunc("/list",list)
-  if err := http.ListenAndServe(":8080",nil); err != nil {
-    panic(err)
-  }
-}
-
-
-func cacheServer(){
-
-  // sorta object oriented approach
-  // afaik necessary for headers
-  client := &http.Client{}
-
-  req , err := http.NewRequest("GET",url,nil)
+func populate (sub *Subreddit) bool{
+    url := "https://www.reddit.com/r/" + sub.Name + "/.json?limit=100"
+    client := &http.Client{}
+    req , err := http.NewRequest("GET",url,nil)
     if err != nil{
-      panic(err)
-  }
+        panic(err)
+    }
+    req.Header.Add("User-Agent",uAgent)
 
-  req.Header.Add("User-Agent",uAgent)
-
-
-  // Updates our collection of entries every 
-  // few seconds
-  for ;; {
-    
     resp , err := client.Do(req)
     if err != nil{
-      panic(err)
+      return false
     }
 
     defer resp.Body.Close()
 
     rBody, err := ioutil.ReadAll(resp.Body)
     if err != nil{
-      panic(err)
+      return false
     }
 
     /* 
@@ -119,7 +81,7 @@ func cacheServer(){
        then another one from the children
        which gives us an array of Posts
     */
-
+       
     var buffer interface{}
     json.Unmarshal(rBody,&buffer)
     root := buffer.(map[string]interface{})
@@ -130,7 +92,6 @@ func cacheServer(){
     // Note that the type signature of children is []interface
     // and not a map, because it an array.
     children := body.(map[string]interface{})["children"].([]interface{})
-    fmt.Println(len(children))
     posts = posts[:0]
     for _, rawPost := range children{
         post := rawPost.(map[string]interface{})
@@ -141,20 +102,83 @@ func cacheServer(){
         if stickied{
             continue
         }
-        posts  = append(posts,Post{title,url})
-        //fmt.Println(posts)
+        sub.Posts  = append(sub.Posts,Post{title,url})
     }
 
-    // rest duration
-    time.Sleep(timeDelay * time.Second)
+    sub.LastUpdated = int64(time.Now().Unix())
 
-  }
-  
+    return true
+}
+
+func getYouTubeVideos(w http.ResponseWriter , r *http.Request){
+    paramSub := r.FormValue("sub")
+    if paramSub == ""{
+        w.Write(errors.EmptyParameter)
+        return
+    }
+
+    sub, ok := Subreddits[paramSub]
+    if !ok{
+        sub.Name = paramSub
+        sub.LastUpdated = int64(time.Now().Unix())
+        if !populate(&sub){
+            w.Write(errors.InvalidSub)
+            return
+        }
+        Subreddits[paramSub] = sub
+    }else{
+        
+        if int64(time.Now().Unix()) > (sub.LastUpdated + 120) {
+            if !populate(&sub){
+                w.Write(errors.CouldNotPopulate)
+                return
+            }
+        }
+    }
+
+    limit := 25
+    paramLimit := r.FormValue("limit")
+    if paramLimit != ""{
+        limit, _ = strconv.Atoi(paramLimit)
+    }
+    limit = helpers.IntMin(limit,len(sub.Posts))
+
+    b, _ := json.Marshal(Subreddit{sub.Name,sub.LastUpdated,sub.Posts[0:limit]})
+    
+    w.Write(b)
+}
+
+func list(w http.ResponseWriter , r *http.Request){
+    if len(posts) == 0 {
+        w.Write(errors.NotInitializedError)
+        return
+    }
+    limit := 25
+    paramLimit := r.FormValue("limit")
+    if paramLimit != ""{
+        limit, _ = strconv.Atoi(paramLimit)
+    }
+    limit = helpers.IntMin(limit,len(posts))
+    b, _ := json.Marshal(posts[0:limit])
+    w.Write(b)
 
 }
 
+
+func server(){
+  http.Handle("/", http.FileServer(http.Dir("./static")))
+  http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+  //http.HandleFunc("/list",list)
+  http.HandleFunc("/youtubevideos",getYouTubeVideos)
+  if err := http.ListenAndServe(":8080",nil); err != nil {
+    panic(err)
+  }
+}
+
+  
+
 func main(){
+    Subreddits = make(map[string]Subreddit)
     fmt.Println(url)
-    go cacheServer()
     server()
 }
