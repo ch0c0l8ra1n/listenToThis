@@ -16,6 +16,7 @@ var timeDelay time.Duration = 2
 
 var url = "http://www.reddit.com/r/listentothis/.json?limit=" + strconv.Itoa(limit)
 var uAgent = "rjpj's obscure ageint v0.0.1"
+var refreshTime = int64(600)
 
 type Post struct{
     Title string
@@ -130,7 +131,7 @@ func getYouTubeVideos(w http.ResponseWriter , r *http.Request){
         Subreddits[paramSub] = sub
     }else{
         
-        if int64(time.Now().Unix()) > (sub.LastUpdated + 120) {
+        if int64(time.Now().Unix()) > (sub.LastUpdated + refreshTime) {
             if !populate(&sub){
                 w.Write(errors.CouldNotPopulate)
                 return
@@ -174,7 +175,6 @@ func list(w http.ResponseWriter , r *http.Request){
 func server(){
   http.Handle("/", http.FileServer(http.Dir("./static")))
   http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-  //http.HandleFunc("/list",list)
   http.HandleFunc("/youtubevideos",getYouTubeVideos)
   if err := http.ListenAndServe(":8080",nil); err != nil {
     panic(err)

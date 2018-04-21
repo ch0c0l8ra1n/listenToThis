@@ -17,19 +17,55 @@ function temp(){
 }
 
 
+// Download the playerapi library first.
+var tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+var firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-ifr = `<iframe width="854" height="480" 
-       src="{0}?autoplay=1" frameborder="0"
-       allow="autoplay; encrypted-media" 
-       allowfullscreen></iframe>`
+// Now we create a player instance
+var player;
 
-/*
-req = new XMLHttpRequest()
-req.open("GET","http://127.0.0.1:8080/list?limit=10",true)
-req.onreadystatechange = temp
-req.send()
-*/
+// Once the library has finished loading,
+// this will be executed.
+function onYouTubeIframeAPIReady() {
+  player = new YT.Player('player', {
+    height: '390',
+    width: '640',
+    playerVars : {'autoplay' : 1},
+    events: {
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange
+    }
+  });
+}
 
+function playlistRetreived(){
+  if (this.readyState == 4 && this.status == 200) {
+      playlist = JSON.parse(this.responseText).Posts;
+      playlist = playlist.map(x => getId(x["Url"]) )
+      player.loadPlaylist(shuffle(playlist))
+    }
+}
+
+function onPlayerReady(event) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET","http://127.0.0.1:8080/youtubevideos?sub=listentothis",true);
+  xhr.onreadystatechange= playlistRetreived;
+  xhr.send();
+}
+
+var done = false;
+function onPlayerStateChange(event) {
+  if (event.data != YT.PlayerState.PLAYING && !done) {
+    player.playVideo()
+    done = true;
+  }
+}
+
+function stopVideo() {
+  player.stopVideo();
+}
 
 
 
