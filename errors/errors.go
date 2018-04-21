@@ -24,3 +24,6 @@ var CouldNotPopulate , _ = json.Marshal(
 var InvalidSub , _ = json.Marshal(
                            Error { 3,
                            "The Subreddit is invalid."})
+var SimilarRequestProcessing , _ = json.Marshal(
+                            Error{ 4,
+                            "A similar request is already processing. Please try again in a few seconds."})

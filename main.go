@@ -81,7 +81,7 @@ func populate (sub *Subreddit) bool{
        then another one from the children
        which gives us an array of Posts
     */
-       
+
     var buffer interface{}
     json.Unmarshal(rBody,&buffer)
     root := buffer.(map[string]interface{})
@@ -121,7 +121,9 @@ func getYouTubeVideos(w http.ResponseWriter , r *http.Request){
     if !ok{
         sub.Name = paramSub
         sub.LastUpdated = int64(time.Now().Unix())
+        Subreddits[paramSub] = sub
         if !populate(&sub){
+            delete(Subreddits,paramSub)
             w.Write(errors.InvalidSub)
             return
         }
@@ -142,6 +144,10 @@ func getYouTubeVideos(w http.ResponseWriter , r *http.Request){
         limit, _ = strconv.Atoi(paramLimit)
     }
     limit = helpers.IntMin(limit,len(sub.Posts))
+
+    if sub.Posts == nil{
+        w.Write(errors.SimilarRequestProcessing)
+    }
 
     b, _ := json.Marshal(Subreddit{sub.Name,sub.LastUpdated,sub.Posts[0:limit]})
     
