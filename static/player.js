@@ -4,7 +4,7 @@ var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 var xhr = new XMLHttpRequest()
-xhr.open("GET","http://127.0.0.1:8080/youtubevideos?sub=listentothis",true)
+xhr.open("GET","/youtubevideos?sub=listentothis",true)
 xhr.onload = onPlaylistReceived
 
 //onYouTubeIframeAPIReady()
@@ -69,7 +69,7 @@ function switchPlaylist(){
   console.log(searchTerm)
 
   var xhr = new XMLHttpRequest()
-  xhr.open("GET","http://127.0.0.1:8080/youtubevideos?sub=" + searchTerm,true)
+  xhr.open("GET","/youtubevideos?sub=" + searchTerm,true)
   xhr.onload = onPlaylistReceived
   xhr.send()
 
