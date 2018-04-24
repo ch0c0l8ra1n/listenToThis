@@ -30,9 +30,10 @@ function onYouTubeIframeAPIReady() {
 
 function onPlaylistReceived(){
   var playlistJsonRaw = JSON.parse(this.responseText)
-  playlistJson = playlistJsonRaw.Posts
+  var playlistJson = playlistJsonRaw.Posts
   shuffle(playlistJson)
   playlistJson = playlistJson.map(x => getId(x["Url"])).filter(x => x)
+  console.log(playlistJson)
   player.loadPlaylist(playlistJson)
 }
 
@@ -52,14 +53,30 @@ function onCueChange() {
   player.playVideo();
 }
 
+
+function searchKeyPressed(event){
+  if (event.keyCode == 13){
+    switchPlaylist()
+  }
+}
+
 function switchPlaylist(){
   searchField = document.getElementsByClassName("searchWrapper")[0].children[0]
   searchTerm = searchField.value
-  var Exp = /^[0-9a-zA-Z]+$/;
-  if(!searchTerm.match(Exp)){
-    invalidSub()
-  }
-  else{
+  searchTerm = searchTerm.filter(x => x.match(/^[0-9a-zA-Z]+$/)  ).join("")
+  searchField.value = searchTerm
 
-  }
+  console.log(searchTerm)
+
+  var xhr = new XMLHttpRequest()
+  xhr.open("GET","http://127.0.0.1:8080/youtubevideos?sub=" + searchTerm,true)
+  xhr.onload = onPlaylistReceived
+  xhr.send()
+
 }
+
+
+
+
+
+

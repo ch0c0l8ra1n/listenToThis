@@ -24,8 +24,8 @@
     <div class="searchRoot">
         <div class="searchBar">
             <div class="searchWrapper">
-                <input placeholder="Subreddit, Eg: videos ">
-                <i class="fa fa-search" onclick='switchPlaylist'></i>
+                <input placeholder="Subreddit, Eg: videos " onkeypress="return searchKeyPressed(event)">
+                <i class="fa fa-search" onclick='switchPlaylist()'></i>
             </div>
         </div>
     </div>

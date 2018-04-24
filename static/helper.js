@@ -1,3 +1,5 @@
+String.prototype.filter = Array.prototype.filter
+
 String.prototype.format = function() {
   /*
   // Python-esque string formatting.
