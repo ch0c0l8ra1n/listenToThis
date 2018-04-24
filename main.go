@@ -10,6 +10,8 @@ import (
   "./helpers"
   "./errors"
   "log"
+  "os"
+  "github.com/gorilla/handlers"
 )
 
 var limit = 100
@@ -184,7 +186,7 @@ func server(){
   http.Handle("/", http.FileServer(http.Dir("./static")))
   http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
   http.HandleFunc("/youtubevideos",getYouTubeVideos)
-  if err := http.ListenAndServe(":8080",nil); err != nil {
+  if err := http.ListenAndServe(":8080",handlers.LoggingHandler(os.Stdout, http.DefaultServeMux)); err != nil {
     panic(err)
   }
 }
