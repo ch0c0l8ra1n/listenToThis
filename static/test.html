@@ -2,7 +2,10 @@
     <title>RJPJ</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta charset="utf-8">
-    <script src="http://www.youtube.com/player_api"></script>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" >
+
+
     <script src="/static/helper.js"></script>
     <link href="/layout.css" rel="stylesheet">
 </head>
@@ -13,11 +16,20 @@
     </div>
 
 
-    <div id="playerHolder">
+    <div class="playerHolder">
         <div id="player">  
         </div>
     </div>
 
-    <script src="/static/test.js"></script>
+    <div class="searchRoot">
+        <div class="searchBar">
+            <div class="searchWrapper">
+                <input placeholder="Subreddit, Eg: videos ">
+                <i class="fa fa-search" onclick='switchPlaylist'></i>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/player.js"></script>
 
 </body>

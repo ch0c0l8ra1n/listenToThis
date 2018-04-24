@@ -9,6 +9,7 @@ import (
   "strconv"
   "./helpers"
   "./errors"
+  "log"
 )
 
 var limit = 100
@@ -16,7 +17,7 @@ var timeDelay time.Duration = 2
 
 var url = "http://www.reddit.com/r/listentothis/.json?limit=" + strconv.Itoa(limit)
 var uAgent = "rjpj's obscure ageint v0.0.1"
-var refreshTime = int64(600)
+var refreshTime = int64(60 * 10)
 
 type Post struct{
     Title string
@@ -45,6 +46,7 @@ func populate (sub *Subreddit) bool{
 
     resp , err := client.Do(req)
     if err != nil{
+      log.Println(err)
       return false
     }
 
@@ -52,6 +54,7 @@ func populate (sub *Subreddit) bool{
 
     rBody, err := ioutil.ReadAll(resp.Body)
     if err != nil{
+      log.Println(err)
       return false
     }
 
@@ -117,6 +120,10 @@ func getYouTubeVideos(w http.ResponseWriter , r *http.Request){
         w.Write(errors.EmptyParameter)
         return
     }
+    if !helpers.IsSubValid(paramSub){
+      w.Write(errors.InvalidSub)
+      return
+    }
 
     sub, ok := Subreddits[paramSub]
     if !ok{
@@ -136,6 +143,7 @@ func getYouTubeVideos(w http.ResponseWriter , r *http.Request){
                 w.Write(errors.CouldNotPopulate)
                 return
             }
+            Subreddits[paramSub] = sub
         }
     }
 

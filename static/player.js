@@ -3,34 +3,63 @@ tag.src = "https://www.youtube.com/iframe_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
+var xhr = new XMLHttpRequest()
+xhr.open("GET","http://127.0.0.1:8080/youtubevideos?sub=listentothis",true)
+xhr.onload = onPlaylistReceived
+
+//onYouTubeIframeAPIReady()
+
 var player;
 function onYouTubeIframeAPIReady() {
+  console.log("Player loaded")
   player = new YT.Player('player', {
     height: '390',
     width: '640',
-    videoId: 'M7lc1UVf-VE',
+    playerVars : {
+      'autoplay' : 1,
+      'modestbranding' : 1,
+      'enablejsapi' : 1
+    },
     events: {
       'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange
-    }
-  });
+      'onStateChange': onPlayerStateChange,
+      }
+    });
 }
+
+
+function onPlaylistReceived(){
+  var playlistJsonRaw = JSON.parse(this.responseText)
+  playlistJson = playlistJsonRaw.Posts
+  shuffle(playlistJson)
+  playlistJson = playlistJson.map(x => getId(x["Url"])).filter(x => x)
+  player.loadPlaylist(playlistJson)
+}
+
 
 function onPlayerReady(event) {
-  player.loadPlaylist(
-    ["3TFtvqwsLg4","GdPW8oMwjoY"],
-  )
+  xhr.send()
 }
 
-var done = false;
+
 function onPlayerStateChange(event) {
-  if (event.data == YT.PlayerState.PLAYING && !done) {
-    done = true;
+  if (event.data == YT.PlayerState.UNSTARTED) {
+    player.playVideo()
   }
 }
 
-
-function stopVideo() {
-  player.stopVideo();
+function onCueChange() {
+  player.playVideo();
 }
 
+function switchPlaylist(){
+  searchField = document.getElementsByClassName("searchWrapper")[0].children[0]
+  searchTerm = searchField.value
+  var Exp = /^[0-9a-zA-Z]+$/;
+  if(!searchTerm.match(Exp)){
+    invalidSub()
+  }
+  else{
+
+  }
+}

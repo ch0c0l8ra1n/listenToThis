@@ -17,7 +17,7 @@ body {
   padding-top: 10px;
   padding-bottom: 10px;
   display: flex;
-  background-color: #fff;
+  background-color: rgb(0,139,253);
   align-items: stretch;
   padding-right: 10px;
   font-size: 20px;
@@ -27,15 +27,70 @@ body {
     margin: auto;
     text-decoration: none;
     font-family: Helvetica , sans-serif;
-    color: black;
     font-size: 1.0em;
+    color: #fff;
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 500px){
 .navBar > a {
+    text-decoration: none;
+    font-family: Helvetica;
     font-family: 'Do Hyeon', sans-serif;
     font-size: 2.5em;
-  }
+    }
+}
+
+.playerHolder{
+    margin-top: 5%;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.searchRoot{
+  display: flex;
+  justify-content: center;
+  margin-top: 2%;
+}
+
+.searchBar{
+  display: flex;
+  background-color: rgb(0,139,253);
+  padding: 10px;
+  border-radius: 3em;
+
+}
+
+.searchWrapper{
+  background-color: #eee;
+  padding: 10px;
+  border-radius: 3em;
+
+}
+
+
+
+.searchWrapper > * {
+  font-size: 2em;
+  color: #333;
+}
+
+
+.searchWrapper > input {
+  background-color: transparent;
+  border: none;
+  outline: none;
+}
+
+.searchWrapper > i {
+  transition: 1s;
+}
+
+.searchWrapper > i:hover {
+  color: rgb(0,139,253);
+}
+
+
 
 
 
