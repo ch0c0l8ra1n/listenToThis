@@ -82,6 +82,7 @@ body {
 }
 
 .searchWrapper > i {
+  color: #333;
   transition: 1s;
 }
 

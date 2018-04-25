@@ -7,8 +7,6 @@ var xhr = new XMLHttpRequest()
 xhr.open("GET","/youtubevideos?sub=listentothis",true)
 xhr.onload = onPlaylistReceived
 
-//onYouTubeIframeAPIReady()
-
 var player;
 function onYouTubeIframeAPIReady() {
   console.log("Player loaded")
@@ -43,9 +41,14 @@ function onPlayerReady(event) {
 }
 
 
+var done = false
 function onPlayerStateChange(event) {
-  if (event.data == YT.PlayerState.UNSTARTED) {
-    player.playVideo()
+  console.log(event.data)
+  if (event.data == YT.PlayerState.PLAYING && !done) {
+    console.log("Disabled")
+    searchIcon = document.getElementsByClassName("searchWrapper")[0].children[1]
+    searchIcon.style.color = "#333"
+    done = true
   }
 }
 
@@ -61,6 +64,12 @@ function searchKeyPressed(event){
 }
 
 function switchPlaylist(){
+  searchIcon = document.getElementsByClassName("searchWrapper")[0].children[1]
+
+  searchIcon.style.color = "rgb(0,139,253)"
+  done = false
+
+
   searchField = document.getElementsByClassName("searchWrapper")[0].children[0]
   searchTerm = searchField.value
   searchTerm = searchTerm.filter(x => x.match(/^[0-9a-zA-Z]+$/)  ).join("")
