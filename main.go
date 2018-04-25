@@ -200,7 +200,7 @@ func server(){
   
 
 func main(){
-    HomePage , _ = ioutil.ReadFile("./static/test.html")
+    HomePage , _ = ioutil.ReadFile("./static/index.html")
     Subreddits = make(map[string]Subreddit)
     fmt.Println(url)
     server()
