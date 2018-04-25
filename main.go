@@ -189,10 +189,16 @@ func home(w http.ResponseWriter, r *http.Request){
 
 
 func server(){
+  LogFile , err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+  defer LogFile.Close()
+  if err != nil{
+    panic(err)
+  }
   http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
   http.HandleFunc("/youtubevideos",getYouTubeVideos)
   http.HandleFunc("/",home)
-  if err := http.ListenAndServe(":8080",handlers.LoggingHandler(os.Stdout, http.DefaultServeMux)); err != nil {
+  LoggingHandler := handlers.LoggingHandler(LogFile, http.DefaultServeMux)
+  if err := http.ListenAndServe(":8080",handlers.CompressHandler(LoggingHandler)); err != nil {
     panic(err)
   }
 }
