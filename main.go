@@ -21,10 +21,13 @@ var url = "http://www.reddit.com/r/listentothis/.json?limit=" + strconv.Itoa(lim
 var uAgent = "rjpj's obscure ageint v0.0.1"
 var refreshTime = int64(60 * 10)
 
+var HomePage []byte
+
 type Post struct{
     Title string
     Url string
 }
+
 
 
 var posts []Post
@@ -166,27 +169,30 @@ func getYouTubeVideos(w http.ResponseWriter , r *http.Request){
 }
 
 func list(w http.ResponseWriter , r *http.Request){
-    if len(posts) == 0 {
-        w.Write(errors.NotInitializedError)
-        return
-    }
-    limit := 25
-    paramLimit := r.FormValue("limit")
-    if paramLimit != ""{
-        limit, _ = strconv.Atoi(paramLimit)
-    }
-    limit = helpers.IntMin(limit,len(posts))
-    b, _ := json.Marshal(posts[0:limit])
-    w.Write(b)
+  if len(posts) == 0 {
+      w.Write(errors.NotInitializedError)
+      return
+  }
+  limit := 25
+  paramLimit := r.FormValue("limit")
+  if paramLimit != ""{
+      limit, _ = strconv.Atoi(paramLimit)
+  }
+  limit = helpers.IntMin(limit,len(posts))
+  b, _ := json.Marshal(posts[0:limit])
+  w.Write(b)
+}
 
+func home(w http.ResponseWriter, r *http.Request){
+  w.Write(HomePage)
 }
 
 
 func server(){
-  http.Handle("/", http.FileServer(http.Dir("./static")))
   http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
   http.HandleFunc("/youtubevideos",getYouTubeVideos)
-  if err := http.ListenAndServe(":80",handlers.LoggingHandler(os.Stdout, http.DefaultServeMux)); err != nil {
+  http.HandleFunc("/",home)
+  if err := http.ListenAndServe(":8080",handlers.LoggingHandler(os.Stdout, http.DefaultServeMux)); err != nil {
     panic(err)
   }
 }
@@ -194,6 +200,7 @@ func server(){
   
 
 func main(){
+    HomePage , _ = ioutil.ReadFile("./static/test.html")
     Subreddits = make(map[string]Subreddit)
     fmt.Println(url)
     server()
