@@ -32,7 +32,6 @@ body {
 
 
 .playerHolder{
-    margin-top: 5%;
     display: flex;
     align-items: stretch;
     justify-content: center;
@@ -46,9 +45,8 @@ body {
     font-size: 2.5em;
   }
   .playerHolder{
-    margin-top: 0%;
+    margin-top: 5%;
   }
-
 
 }
 
