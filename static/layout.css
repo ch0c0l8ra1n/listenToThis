@@ -30,20 +30,26 @@ body {
     color: #fff;
 }
 
-@media (min-width: 500px){
-.navBar > a {
-    text-decoration: none;
-    font-family: Helvetica;
-    font-family: 'Do Hyeon', sans-serif;
-    font-size: 2.5em;
-    }
-}
 
 .playerHolder{
     margin-top: 5%;
     display: flex;
     align-items: stretch;
     justify-content: center;
+}
+
+@media (min-width: 500px){
+  .navBar > a {
+    text-decoration: none;
+    font-family: Helvetica;
+    font-family: 'Do Hyeon', sans-serif;
+    font-size: 2.5em;
+  }
+  .playerHolder{
+    margin-top: 0%;
+  }
+
+
 }
 
 .searchRoot{
