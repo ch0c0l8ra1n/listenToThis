@@ -1,12 +1,15 @@
+// Creates a script tag, I am not sure why I should not hardcode it
 var tag = document.createElement('script');
 tag.src = "https://www.youtube.com/iframe_api";
 var firstScriptTag = document.getElementsByTagName('script')[0];
 firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
+
 var xhr = new XMLHttpRequest()
 xhr.open("GET","/youtubevideos?sub=listentothis",true)
 xhr.onload = onPlaylistReceived
 
+// Create the player once the iframe api loads
 var player;
 function onYouTubeIframeAPIReady() {
   console.log("Player loaded")

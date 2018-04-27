@@ -1,3 +1,4 @@
+//Convinience
 String.prototype.filter = Array.prototype.filter
 
 String.prototype.format = function() {
@@ -67,6 +68,7 @@ function embed(url){
 }
 
 function getId(url){
+  // Gets the id of the youtube video from url
   var u = parseURL(url)
   switch (u.hostname){
     case "www.youtube.com":
@@ -82,6 +84,7 @@ function getId(url){
 }
 
 function shuffle(array) {
+  // Shuffles an array
   var currentIndex = array.length, temporaryValue, randomIndex;
 
   // While there remain elements to shuffle...
